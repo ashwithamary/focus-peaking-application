@@ -138,3 +138,32 @@ The core of the application is the focus peaking algorithm implemented in `backe
 4. **Blending**: We blend this mask with the original image to create the focus peaking effect
 
 The algorithm's sensitivity can be adjusted through the threshold parameter.
+
+## Additional Features
+
+### Cross-Platform Compatibility
+This application supports both Linux and Windows environments:
+- Linux: Use the `install.sh` and `run.sh` scripts
+- Windows: Use the `install.bat` and `run.bat` scripts
+
+### ShadCN UI Integration
+The user interface is built with ShadCN UI components, providing:
+- Clean, modern design elements
+- Accessible UI controls
+- Responsive layout for different screen sizes
+- Theme consistency throughout the application
+
+### Customizable Focus Peaking
+Users can customize the focus peaking experience:
+- Choose from multiple highlight colors (green, red, blue, yellow)
+- Switch between video and webcam sources
+- Toggle the effect on and off with a single click
+
+## Project Structure
+- `/backend`: Python Flask server with OpenCV processing
+  - `focus_peaking.py`: Core algorithm implementation
+  - `main.py`: Flask server setup and API endpoints
+- `/frontend`: React application
+  - `/components`: React components including ShadCN UI elements
+  - `/public`: Static assets including the sample video
+  - `/src`: React application source code
