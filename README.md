@@ -73,8 +73,8 @@ The application includes webcam support for real-time focus peaking:
 
 1. Clone this repository:
    ```bash
-   git clone https://github.com/yourusername/focus-peaking-app.git
-   cd focus-peaking-app
+   git clone https://github.com/yourusername/focus-peaking-application.git
+   cd focus-peaking-application
    ```
 
 2. Make the installation script executable:
