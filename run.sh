@@ -1,98 +1,58 @@
 #!/bin/bash
-
 echo "Starting Focus Peaking Application..."
 
 # Check if the sample video exists
 if [ ! -f "frontend/public/sample.mp4" ]; then
     echo "ERROR: Sample video not found!"
     echo "Please run ./install.sh first or manually download the sample video."
-    echo "Video URL: https://drive.google.com/file/d/1h0vtWUQvB3bjYyGRKsDpHyVKVpz5jEnJ/view"
-    echo "Please download it and place it at: frontend/public/sample.mp4"
     exit 1
 fi
 
-# Function to check if port is available
-port_is_available() {
-    if command -v netstat &> /dev/null; then
-        ! netstat -tuln | grep -q ":$1 "
-        return $?
-    elif command -v ss &> /dev/null; then
-        ! ss -tuln | grep -q ":$1 "
-        return $?
-    else
-        # If neither tool is available, assume port is available
-        return 0
+# Check if port 5000 is already in use and kill the process if needed
+if command -v lsof &> /dev/null; then
+    if lsof -Pi :5000 -sTCP:LISTEN -t >/dev/null ; then
+        echo "Port 5000 is already in use. Stopping the previous process..."
+        kill $(lsof -t -i:5000) 2>/dev/null || true
+        sleep 1
     fi
-}
-
-# Check if ports are available
-BACKEND_PORT=5000
-FRONTEND_PORT=3000
-
-if ! port_is_available $BACKEND_PORT; then
-    echo "ERROR: Port $BACKEND_PORT is already in use. Please free it up and try again."
-    exit 1
+elif command -v ss &> /dev/null; then
+    if ss -tuln | grep -q ":5000 "; then
+        echo "Port 5000 is already in use. Please free it up and try again."
+        exit 1
+    fi
 fi
 
-if ! port_is_available $FRONTEND_PORT; then
-    echo "ERROR: Port $FRONTEND_PORT is already in use. Please free it up and try again."
-    exit 1
-fi
-
-# Create a file to store pids
-echo -n "" > .pids.txt
+# Activate the virtual environment
+source venv/bin/activate
 
 # Start the Python backend server
 echo "Starting backend server..."
 cd backend
-python3 main.py &
+python main.py &
 BACKEND_PID=$!
 cd ..
-echo $BACKEND_PID > .pids.txt
 
 # Wait for the backend to start up
 echo "Waiting for backend to start..."
 sleep 3
 
-# Check if backend started successfully
-if ! port_is_available $BACKEND_PORT; then
-    echo "Backend started successfully on port $BACKEND_PORT"
-else
+# Check if backend is running
+if ! ps -p $BACKEND_PID > /dev/null; then
     echo "ERROR: Backend failed to start. Please check for errors."
-    kill $BACKEND_PID 2>/dev/null
+    deactivate
     exit 1
 fi
 
+echo "✓ Backend started successfully."
+
 # Start the React frontend
-echo "Starting frontend application..."
+echo "Starting frontend..."
 cd frontend
-npm start &
-FRONTEND_PID=$!
-cd ..
-echo $FRONTEND_PID >> .pids.txt
+npm start
 
-# Function to handle script termination
-cleanup() {
-    echo "Shutting down application..."
-    if [ -f .pids.txt ]; then
-        for pid in $(cat .pids.txt); do
-            kill $pid 2>/dev/null
-        done
-        rm .pids.txt
-    fi
-    exit 0
-}
+# This will only run after npm start finishes (user presses Ctrl+C)
+echo "Shutting down application..."
+kill $BACKEND_PID 2>/dev/null
 
-# Set up trap to catch termination signals
-trap cleanup SIGINT SIGTERM
-
-echo ""
-echo "Focus Peaking Application is running!"
-echo "- Backend server: http://localhost:5000"
-echo "- Frontend application: http://localhost:3000"
-echo ""
-echo "Press Ctrl+C to stop the application."
-echo ""
-
-# Keep the script running
-wait
+# Exit the virtual environment
+deactivate
