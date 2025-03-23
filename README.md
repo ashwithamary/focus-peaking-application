@@ -59,6 +59,7 @@ The application includes webcam support for real-time focus peaking:
 - Focus peaking is applied to the webcam feed in real-time
 - The same color options are available for both video and webcam modes
 - Webcam access requires user permission (browser will prompt for camera access)
+- Note: The webcam feature requires access to a physical camera. It may not work in virtual machine environments without proper camera passthrough configuration.
 
 ## Installation
 
@@ -88,6 +89,7 @@ The application includes webcam support for real-time focus peaking:
    ```
 
 This will:
+- Create a Python virtual environment for clean dependency management
 - Install all necessary Python and Node.js dependencies
 - Download the sample video into the correct location
 - Prepare the application for running
@@ -105,6 +107,7 @@ This will:
    ```
 
 This will:
+- Activate the Python virtual environment
 - Start the Python backend server (port 5000)
 - Start the React frontend application (port 3000)
 - Automatically open the application in your default web browser
@@ -115,9 +118,10 @@ This will:
 
 ### Common Issues
 
-- **Port conflicts**: If ports 3000 or 5000 are already in use, you may need to stop other services using those ports
+- **Port conflicts**: If ports 3000 or 5000 are already in use, the run.sh script will attempt to free port 5000 automatically. If issues persist, you may need to manually stop other services using these ports.
 - **Browser compatibility**: The webcam feature works best in Chrome or Firefox
 - **Backend connection**: If you see connection errors, make sure the backend server is running
+- **Virtual environment**: If you encounter Python module errors, ensure the virtual environment is activated properly
 
 ### Manual Steps
 
@@ -167,3 +171,4 @@ Users can customize the focus peaking experience:
   - `/components`: React components including ShadCN UI elements
   - `/public`: Static assets including the sample video
   - `/src`: React application source code
+- `/venv`: Python virtual environment (created during installation)
